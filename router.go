@@ -14,15 +14,13 @@ type Router struct {
 }
 
 func (this *Router) Add(method, path string, h interface{}) {
-	if path[0] != '/' {
-		panic("path must begin with '/' in: " + path)
-	} else if path[len(path)-1] == '/' {
-		panic("path must not end with '/' in: " + path)
+	parts := []string{method}
+	path = strings.Trim(path, "/")
+	if len(path) > 0 {
+		parts = append(parts, strings.Split(path, "/")...)
 	}
 
-	parts := append([]string{method}, strings.Split(path[1:], "/")...)
 	node := this
-
 	for _, p := range parts {
 		if p[0] == ':' && len(p) > 2 {
 			varName := p[1:]
@@ -44,14 +42,22 @@ func (this *Router) Add(method, path string, h interface{}) {
 		node = n
 	}
 
+	if node.handler != nil {
+		panic("duplicate path: " + path)
+	}
+
 	node.handler = h
 }
 
 func (this *Router) Match(method, path string) (interface{}, map[string]string) {
-	parts := append([]string{method}, strings.Split(path[1:], "/")...)
+	parts := []string{method}
+	path = strings.Trim(path, "/")
+	if len(path) > 0 {
+		parts = append(parts, strings.Split(path, "/")...)
+	}
+
 	params := make(map[string]string)
 	node := this
-
 	for _, p := range parts {
 		n, ok := node.children[p]
 
