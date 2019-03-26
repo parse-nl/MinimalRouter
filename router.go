@@ -13,6 +13,19 @@ type Router struct {
 	handler  interface{}
 }
 
+func (this *Router) Get(path string, h interface{}) {
+	this.Add("GET", path, h)
+}
+func (this *Router) Post(path string, h interface{}) {
+	this.Add("POST", path, h)
+}
+func (this *Router) Put(path string, h interface{}) {
+	this.Add("PUT", path, h)
+}
+func (this *Router) Delete(path string, h interface{}) {
+	this.Add("DELETE", path, h)
+}
+
 func (this *Router) Add(method, path string, h interface{}) {
 	parts := []string{method}
 	path = strings.Trim(path, "/")
